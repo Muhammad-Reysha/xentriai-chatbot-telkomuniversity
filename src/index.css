@@ -1,0 +1,63 @@
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap');
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+@theme {
+  --color-bg-deep: var(--bg-deep);
+  --color-surface-dark: var(--surface-dark);
+  --color-bg-sidebar: var(--bg-sidebar);
+  --color-primary-teal: var(--primary-teal);
+  --color-primary-teal-light: var(--primary-teal-light);
+  --color-primary-teal-glow: var(--primary-teal-glow);
+  --color-text-dim: var(--text-dim);
+  --color-text-bright: var(--text-bright);
+  
+  --font-sans: "Manrope", ui-sans-serif, system-ui, sans-serif;
+  
+  --shadow-glow: 0 0 15px var(--color-primary-teal-glow);
+  --shadow-glow-lg: 0 0 30px rgba(111, 215, 214, 0.3);
+}
+
+@layer base {
+  :root {
+    --bg-deep: #07122C;
+    --surface-dark: #0B1938;
+    --bg-sidebar: #050d24;
+    --primary-teal: #2AA086;
+    --primary-teal-light: #68E6A8;
+    --primary-teal-glow: rgba(111, 215, 214, 0.4);
+    --text-dim: #bcc9c8;
+    --text-bright: #e0e3e5;
+  }
+
+  [data-theme='light'], .light {
+    --bg-deep: #f8fafc;
+    --surface-dark: #ffffff;
+    --bg-sidebar: #e2e8f0;
+    --primary-teal: #2AA086;
+    --primary-teal-light: #68E6A8;
+    --primary-teal-glow: rgba(42, 160, 134, 0.3);
+    --text-dim: #000000;
+    --text-bright: #000000;
+  }
+
+  body {
+    @apply bg-bg-deep text-text-bright font-sans antialiased transition-colors duration-300;
+  }
+}
+
+.glass-panel {
+  @apply bg-surface-dark/40 backdrop-blur-md border border-text-dim/20;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  @apply bg-transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  @apply bg-primary-teal/20 rounded-full hover:bg-primary-teal/40 transition-colors;
+}
