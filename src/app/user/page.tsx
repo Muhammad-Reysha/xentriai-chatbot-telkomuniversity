@@ -12,20 +12,16 @@ import { HelpModal } from '../../components/HelpModal';
 import { Message, ChatSession } from '../../types';
 import { useApp } from '../../components/AppContext';
 
-// Normalisasi: pastikan single \n jadi double \n agar markdown render paragraf
 export const normalizeResponse = (text: string) => {
   const decoded = text.replace(/\\n/g, '\n');
 
   const mathFixed = decoded
-    .replace(/\\\[/g, '$$')  // \[ → $$
-    .replace(/\\\]/g, '$$')  // \] → $$
-    .replace(/\\\(/g, '$')   // \( → $
-    .replace(/\\\)/g, '$');  // \) → $
+    .replace(/\\\[/g, '$$')  
+    .replace(/\\\]/g, '$$')  
+    .replace(/\\\(/g, '$')   
+    .replace(/\\\)/g, '$');  
 
-  // Step 1: Ubah semua unicode bullet jadi "- "
   const bulleted = mathFixed.replace(/^[•·●▪▸◆]\s*/gm, '- ');
-
-  // Step 2: Merge baris yang HANYA berisi "-" dengan baris teks berikutnya
   const lines = bulleted.split('\n');
   const merged: string[] = [];
 
@@ -33,13 +29,12 @@ export const normalizeResponse = (text: string) => {
     const trimmed = lines[i].trim();
 
     if (trimmed === '-') {
-      // Cari baris non-kosong berikutnya
       let j = i + 1;
       while (j < lines.length && lines[j].trim() === '') j++;
 
       if (j < lines.length) {
         merged.push('- ' + lines[j].trim());
-        i = j; // skip baris yang sudah digabung
+        i = j; 
       }
       continue;
     }
@@ -47,14 +42,13 @@ export const normalizeResponse = (text: string) => {
     merged.push(lines[i]);
   }
 
-  // Step 3: Hapus blank line di antara list item yang berurutan
   const result: string[] = [];
   for (let i = 0; i < merged.length; i++) {
     const isEmpty = merged[i].trim() === '';
     const prevIsList = merged[i - 1]?.trim().startsWith('- ') ?? false;
     const nextIsList = merged[i + 1]?.trim().startsWith('- ') ?? false;
 
-    if (isEmpty && prevIsList && nextIsList) continue; // buang blank antar list
+    if (isEmpty && prevIsList && nextIsList) continue; 
 
     result.push(merged[i]);
   }

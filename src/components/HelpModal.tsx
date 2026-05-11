@@ -63,12 +63,12 @@ export function HelpModal({ isOpen, onClose }: HelpModalProps) {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="p-4 rounded-xl bg-surface-dark border border-white/5">
                     <h4 className="font-medium text-text-bright mb-1">{t('help.contact.it')}</h4>
-                    <p className="text-sm text-text-dim">0813-1685-5001</p>
+                    <p className="text-sm text-text-dim">0812-3456-7890</p>
                     <p className="text-xs text-text-dim mt-2">Senin - Jumat, 08:00 - 16:00</p>
                   </div>
                   <div className="p-4 rounded-xl bg-surface-dark border border-white/5">
                     <h4 className="font-medium text-text-bright mb-1">{t('help.contact.email')}</h4>
-                    <p className="text-sm text-text-dim">telkomchatbot@gmail.com</p>
+                    <p className="text-sm text-text-dim">support@xentri.ai.edu</p>
                     <p className="text-xs text-text-dim mt-2">Balasan rata-rata 1x24 jam</p>
                   </div>
                 </div>

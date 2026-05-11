@@ -106,7 +106,7 @@ export default function AdminPage() {
         <div ref={scrollRef} className="flex-1 overflow-y-auto custom-scrollbar flex flex-col p-4 md:p-10 relative scroll-smooth">
           {activeTab === 'admin-dashboard' ? (
             currentMessages.length === 0 ? (
-              <div className="flex-1 flex items-start justify-center pb-10 pt-2 md:pt-8 min-h-min">
+              <div className="flex-1 flex flex-col items-center justify-center min-h-[min-content]">
                 <AdminHero />
               </div>
             ) : (

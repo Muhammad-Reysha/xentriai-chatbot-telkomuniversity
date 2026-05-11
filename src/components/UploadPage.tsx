@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { uploadDatasetUser } from '../services/uploadService';
+import { useApp } from './AppContext';
 
 export function UploadPage() {
+  const { t } = useApp();
   const [file, setFile] = useState<File | null>(null);
   const [judul, setJudul] = useState('');
   const [kategori, setKategori] = useState('');
@@ -14,7 +16,7 @@ export function UploadPage() {
     if (selectedFile) {
       // Limit to 300MB (300 * 1024 * 1024 = 314572800 bytes)
       if (selectedFile.size > 314572800) {
-        setMessage({ type: 'error', text: 'Ukuran file melebih batas 300MB.' });
+        setMessage({ type: 'error', text: t('upload.fileSizeError') });
         setFile(null);
         e.target.value = ''; // Reset input
         return;
@@ -26,7 +28,7 @@ export function UploadPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!file || !judul || !kategori) {
-      setMessage({ type: 'error', text: 'Harap lengkapi semua field.' });
+      setMessage({ type: 'error', text: t('upload.missingFields') });
       return;
     }
 
@@ -47,7 +49,7 @@ export function UploadPage() {
         setMessage({ type: 'error', text: response.message });
       }
     } catch (error) {
-      setMessage({ type: 'error', text: 'Terjadi kesalahan saat mengunggah dataset.' });
+      setMessage({ type: 'error', text: t('upload.error') });
     } finally {
       setIsSubmitting(false);
     }
@@ -56,7 +58,7 @@ export function UploadPage() {
   return (
     <div className="flex-1 flex justify-center items-start pt-10">
       <div className="w-full max-w-lg flex flex-col items-center">
-        <h1 className="text-3xl font-bold text-text-bright mb-10">Upload Dataset AI</h1>
+        <h1 className="text-3xl font-bold text-text-bright mb-10">{t('upload.title')}</h1>
         
         <form className="w-full space-y-6" onSubmit={handleSubmit}>
           {message && (
@@ -66,7 +68,7 @@ export function UploadPage() {
           )}
 
           <div className="flex flex-col gap-2">
-            <label className="text-sm text-text-bright" htmlFor="file-upload">Upload PDF (Max 300MB)</label>
+            <label className="text-sm text-text-bright" htmlFor="file-upload">{t('upload.pdfLabel')}</label>
             <div className="relative">
               <input 
                 type="file" 
@@ -79,7 +81,7 @@ export function UploadPage() {
           </div>
 
           <div className="flex flex-col gap-2">
-            <label className="text-sm text-text-bright" htmlFor="judul">Judul</label>
+            <label className="text-sm text-text-bright" htmlFor="judul">{t('upload.titleLabel')}</label>
             <input 
               type="text" 
               id="judul" 
@@ -90,7 +92,7 @@ export function UploadPage() {
           </div>
 
           <div className="flex flex-col gap-2">
-            <label className="text-sm text-text-bright" htmlFor="kategori">Kategori</label>
+            <label className="text-sm text-text-bright" htmlFor="kategori">{t('upload.categoryLabel')}</label>
             <input 
               type="text" 
               id="kategori" 
@@ -105,7 +107,7 @@ export function UploadPage() {
             disabled={isSubmitting}
             className="w-full mt-4 bg-primary-teal hover:bg-primary-teal/90 disabled:bg-primary-teal/50 disabled:cursor-not-allowed text-bg-deep font-semibold py-3 rounded-xl transition-colors"
           >
-            {isSubmitting ? 'Mengunggah...' : 'Submit Dataset'}
+            {isSubmitting ? t('upload.uploading') : t('upload.submit')}
           </button>
         </form>
       </div>
