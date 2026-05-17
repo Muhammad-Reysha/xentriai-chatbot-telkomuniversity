@@ -1,9 +1,12 @@
 import { motion } from 'motion/react';
 import { Cpu, User } from 'lucide-react';
 import { Message } from '../types';
-import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { CodeBlock } from './CodeBlock';
+import ReactMarkdown from 'react-markdown';
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
+import { normalizeResponse } from '../app/user/page';
 
 interface ChatMessagesProps {
   messages: Message[];
@@ -43,12 +46,14 @@ export function ChatMessages({ messages, isLoading }: ChatMessagesProps) {
               >
                 <div className={`prose max-w-none break-words [&>*:first-child]:mt-0 [&>*:last-child]:mb-0 ${message.role === 'user' ? 'prose-sm md:prose-base prose-p:text-bg-deep prose-headings:text-bg-deep prose-strong:text-bg-deep prose-a:text-bg-deep' : 'prose-sm md:prose-base prose-invert prose-p:leading-relaxed prose-pre:bg-transparent prose-pre:border-0 prose-pre:p-0 prose-p:text-text-bright'}`}>
                   <ReactMarkdown 
-                    remarkPlugins={[remarkGfm]}
+                    remarkPlugins={[remarkGfm, remarkMath]}
+                    rehypePlugins={[rehypeKatex]}
                     components={{
                       code: CodeBlock
                     }}
                   >
-                    {message.text}
+                      {message.role === 'model' ? normalizeResponse(message.text) : message.text}
+
                   </ReactMarkdown>
                 </div>
               </div>

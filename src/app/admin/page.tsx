@@ -12,7 +12,7 @@ import { HelpModal } from '../../components/HelpModal';
 import { GoogleGenAI } from '@google/genai';
 import { Message, ChatSession } from '../../types';
 import { useApp } from '../../components/AppContext';
-
+export const dynamic = "force-dynamic"; 
 export default function AdminPage() {
   const { t } = useApp();
   const [activeTab, setActiveTab] = useState('admin-dashboard');

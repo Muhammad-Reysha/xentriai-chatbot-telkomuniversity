@@ -12,44 +12,58 @@ import { HelpModal } from '../../components/HelpModal';
 import { Message, ChatSession } from '../../types';
 import { useApp } from '../../components/AppContext';
 
+
 export const normalizeResponse = (text: string) => {
-  const decoded = text.replace(/\\n/g, '\n');
+  // 1. Decode literal \n
+  let out = text.replace(/\\n/g, '\n');
 
-  const mathFixed = decoded
-    .replace(/\\\[/g, '$$')  
-    .replace(/\\\]/g, '$$')  
-    .replace(/\\\(/g, '$')   
-    .replace(/\\\)/g, '$');  
+  // 2. Konversi delimiter LaTeX pakai regex capture group (hindari bug $$ replacement string)
+  out = out.replace(/\\\[([\s\S]*?)\\\]/g, (_, inner) => `$$${inner}$$`); // \[...\] -> $$...$$
+  out = out.replace(/\\\(([\s\S]*?)\\\)/g, (_, inner) => `$${inner}$`);   // \(...\) -> $...$
 
-  const bulleted = mathFixed.replace(/^[•·●▪▸◆]\s*/gm, '- ');
-  const lines = bulleted.split('\n');
+  // 3. Bracket polos [ ...latex... ] dan ( ...latex... )
+  //    Per-line untuk hindari menabrak isi block math.
+  out = out.split('\n').map(line => {
+    // Skip baris yang sudah jadi block math $$...$$
+    if (/^\$\$[\s\S]*?\$\$$/.test(line.trim())) return line;
+
+    const blockMatch = line.match(/^(.*?)\[([^\[\]]*?\\[a-zA-Z]+[^\[\]]*?)\](.*)$/);
+    if (blockMatch) {
+      const [, before, inner, after] = blockMatch;
+      const convertInline = (s: string) =>
+        s.replace(/\(([^()]*?\\[a-zA-Z]+[^()]*?)\)/g, (_, x) => `$${x}$`);
+      return `${convertInline(before)}$$${inner}$$${convertInline(after)}`;
+    }
+    return line.replace(/\(([^()]*?\\[a-zA-Z]+[^()]*?)\)/g, (_, x) => `$${x}$`);
+  }).join('\n');
+
+  // 4. Bullet karakter -> markdown dash
+  out = out.replace(/^[•·●▪▸◆]\s*/gm, '- ');
+
+  // 5. Gabungkan baris "-" yang terpisah dari isinya
+  const lines = out.split('\n');
   const merged: string[] = [];
-
   for (let i = 0; i < lines.length; i++) {
     const trimmed = lines[i].trim();
-
     if (trimmed === '-') {
       let j = i + 1;
       while (j < lines.length && lines[j].trim() === '') j++;
-
       if (j < lines.length) {
         merged.push('- ' + lines[j].trim());
-        i = j; 
+        i = j;
       }
       continue;
     }
-
     merged.push(lines[i]);
   }
 
+  // 6. Hapus baris kosong di antara list items
   const result: string[] = [];
   for (let i = 0; i < merged.length; i++) {
     const isEmpty = merged[i].trim() === '';
     const prevIsList = merged[i - 1]?.trim().startsWith('- ') ?? false;
     const nextIsList = merged[i + 1]?.trim().startsWith('- ') ?? false;
-
-    if (isEmpty && prevIsList && nextIsList) continue; 
-
+    if (isEmpty && prevIsList && nextIsList) continue;
     result.push(merged[i]);
   }
 
@@ -172,8 +186,15 @@ export default function UserPage() {
         for (const event of events) {
           for (const line of event.split('\n')) {
             if (line.startsWith('data: ')) {
-              const chunk = line.slice(6);
+              let chunk = line.slice(6);
               if (chunk === '[DONE]') continue;
+
+              // Decode escape sequences dari backend
+              chunk = chunk
+                .replace(/\\n/g, '\n')
+                .replace(/\\t/g, '\t')
+                .replace(/\\"/g, '"')
+                .replace(/\\\\/g, '\\');
 
               setChatSessions((prev) =>
                 prev.map((session) =>
